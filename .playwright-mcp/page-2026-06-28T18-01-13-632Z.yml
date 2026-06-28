@@ -1,0 +1,13 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]: SoftSell
+  - main [ref=e5]:
+    - generic [ref=e6]:
+      - heading "Sign in" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Log in to browse the SoftSell store.
+      - generic [ref=e9]: Username
+      - textbox "Username" [active] [ref=e10]
+      - generic [ref=e11]: Password
+      - textbox "Password" [ref=e12]
+      - button "Sign in" [ref=e13] [cursor=pointer]
+      - paragraph [ref=e14]: Accounts are issued by your SoftSell administrator.

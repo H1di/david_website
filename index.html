@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoftSell</title>
+<style>
+  :root { --brand:#4f46e5; --brand-dark:#3730a3; --card:#ffffff; --ink:#0f172a; --muted:#64748b; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink);
+         background:linear-gradient(160deg,#1e293b,#0f172a); min-height:100vh; }
+  header.site { display:flex; align-items:center; justify-content:space-between;
+                padding:18px 28px; color:#fff; flex-wrap:wrap; gap:10px; }
+  .brand { font-size:22px; font-weight:800; letter-spacing:-.5px; }
+  .brand span { color:#a5b4fc; }
+  header.site a { color:#c7d2fe; text-decoration:none; font-weight:600; cursor:pointer; }
+  header.site a:hover { color:#fff; }
+  main { max-width:1040px; margin:0 auto; padding:24px 28px 64px; }
+  .auth-card { max-width:380px; margin:8vh auto; background:var(--card); border-radius:16px;
+               padding:32px; box-shadow:0 20px 50px rgba(0,0,0,.35); }
+  .auth-card h1 { margin:0 0 4px; font-size:24px; }
+  .auth-card p.sub { margin:0 0 22px; color:var(--muted); font-size:14px; }
+  label { display:block; font-size:13px; font-weight:600; margin:14px 0 6px; }
+  input { width:100%; padding:11px 12px; border:1px solid #cbd5e1; border-radius:9px; font-size:15px; }
+  input:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 3px rgba(79,70,229,.15); }
+  button { width:100%; margin-top:22px; padding:12px; border:0; border-radius:9px; cursor:pointer;
+           background:var(--brand); color:#fff; font-size:15px; font-weight:700; }
+  button:hover { background:var(--brand-dark); }
+  .error { background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; padding:10px 12px;
+           border-radius:9px; font-size:14px; margin-bottom:8px; display:none; }
+  .hint { margin-top:18px; font-size:12px; color:var(--muted); text-align:center; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:20px; }
+  .product { background:var(--card); border-radius:14px; padding:20px; box-shadow:0 8px 24px rgba(0,0,0,.18);
+             display:flex; flex-direction:column; }
+  .product h3 { margin:0 0 6px; font-size:18px; }
+  .product .desc { color:var(--muted); font-size:14px; flex:1; }
+  .product .price { font-size:24px; font-weight:800; margin:14px 0 12px; }
+  .badge { align-self:flex-start; background:#eef2ff; color:var(--brand-dark); font-size:11px;
+           font-weight:700; padding:3px 9px; border-radius:999px; margin-bottom:10px; text-transform:uppercase; }
+  .buy { background:var(--brand); color:#fff; text-align:center; padding:10px; border-radius:9px;
+         text-decoration:none; font-weight:700; border:0; cursor:pointer; font-size:14px; }
+  .buy:hover { background:var(--brand-dark); }
+  .welcome { color:#e2e8f0; margin:0 0 22px; }
+  .welcome h2 { color:#fff; margin:0 0 4px; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN VIEW ===================== -->
+<div id="login-view">
+  <header class="site"><div class="brand">Soft<span>Sell</span></div></header>
+  <main>
+    <form class="auth-card" id="login-form">
+      <h1>Sign in</h1>
+      <p class="sub">Log in to browse the SoftSell store.</p>
+      <div class="error" id="login-error"></div>
+      <label for="username">Username</label>
+      <input id="username" name="username" autocomplete="username" autofocus required>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button type="submit">Sign in</button>
+      <p class="hint">Accounts are issued by your SoftSell administrator.</p>
+    </form>
+  </main>
+</div>
+
+<!-- ===================== STORE VIEW ===================== -->
+<div id="store-view" class="hidden">
+  <header class="site">
+    <div class="brand">Soft<span>Sell</span></div>
+    <div>Signed in as <strong id="who"></strong> &nbsp;·&nbsp; <a id="logout">Log out</a></div>
+  </header>
+  <main>
+    <div class="welcome">
+      <h2>Goods for sale</h2>
+      <p>Browse our software products below.</p>
+    </div>
+    <div class="grid" id="product-grid"></div>
+  </main>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// SoftSell — static, GitHub Pages friendly.
+//
+// Auth and catalog run entirely in the browser. Accounts are maintained by
+// hand in users.json; products in products.json. There is no server.
+//
+// SECURITY NOTE: because everything is static, this is a basic gate, NOT real
+// security. Anyone can read users.json/products.json directly. Do not put
+// anything genuinely sensitive behind this login.
+// ---------------------------------------------------------------------------
+'use strict';
+
+const SESSION_KEY = 'softsell_user';
+
+const el = (id) => document.getElementById(id);
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]));
+}
+
+async function loadJSON(file) {
+  const res = await fetch(file, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`Could not load ${file}`);
+  return res.json();
+}
+
+// --- Views -----------------------------------------------------------------
+
+function showLogin() {
+  el('store-view').classList.add('hidden');
+  el('login-view').classList.remove('hidden');
+  el('username').focus();
+}
+
+async function showStore(username) {
+  el('login-view').classList.add('hidden');
+  el('store-view').classList.remove('hidden');
+  el('who').textContent = username;
+
+  const grid = el('product-grid');
+  grid.innerHTML = '<p style="color:#fff">Loading products…</p>';
+  try {
+    const { products = [] } = await loadJSON('products.json');
+    if (!products.length) {
+      grid.innerHTML = '<p style="color:#fff">No products yet. Edit products.json to add some.</p>';
+      return;
+    }
+    grid.innerHTML = products.map((p) => `
+      <div class="product">
+        ${p.badge ? `<div class="badge">${escapeHtml(p.badge)}</div>` : ''}
+        <h3>${escapeHtml(p.name)}</h3>
+        <div class="desc">${escapeHtml(p.description)}</div>
+        <div class="price">$${Number(p.price).toFixed(2)}</div>
+        <button class="buy" data-name="${escapeHtml(p.name)}">Buy now</button>
+      </div>`).join('');
+
+    grid.querySelectorAll('.buy').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        alert(`Thanks! Your interest in "${btn.dataset.name}" has been recorded.\n` +
+              `Checkout/payment is not wired up in this demo.`);
+      });
+    });
+  } catch (err) {
+    grid.innerHTML = `<p style="color:#fff">${escapeHtml(err.message)}</p>`;
+  }
+}
+
+// --- Auth ------------------------------------------------------------------
+
+el('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errBox = el('login-error');
+  errBox.style.display = 'none';
+  const username = el('username').value.trim();
+  const password = el('password').value;
+
+  try {
+    const { users = {} } = await loadJSON('users.json');
+    if (Object.prototype.hasOwnProperty.call(users, username) &&
+        String(users[username]) === password) {
+      sessionStorage.setItem(SESSION_KEY, username);
+      el('login-form').reset();
+      showStore(username);
+      return;
+    }
+  } catch (err) {
+    errBox.textContent = 'Could not reach the account list. Try again.';
+    errBox.style.display = 'block';
+    return;
+  }
+  errBox.textContent = 'Invalid username or password.';
+  errBox.style.display = 'block';
+});
+
+el('logout').addEventListener('click', () => {
+  sessionStorage.removeItem(SESSION_KEY);
+  showLogin();
+});
+
+// --- Boot: restore session if present --------------------------------------
+
+const existing = sessionStorage.getItem(SESSION_KEY);
+if (existing) {
+  showStore(existing);
+} else {
+  showLogin();
+}
+</script>
+</body>
+</html>

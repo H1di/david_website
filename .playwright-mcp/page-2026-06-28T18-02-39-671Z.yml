@@ -1,0 +1,35 @@
+- generic [ref=e16]:
+  - banner [ref=e17]:
+    - generic [ref=e18]: SoftSell
+    - generic [ref=e19]:
+      - text: Signed in as
+      - strong [ref=e20]: David
+      - text: · Log out
+  - main [ref=e21]:
+    - generic [ref=e22]:
+      - heading "Goods for sale" [level=2] [ref=e23]
+      - paragraph [ref=e24]: Browse our software products below.
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e27]: Best value
+        - heading "SoftSell Pro License" [level=3] [ref=e28]
+        - generic [ref=e29]: Full-featured license with priority support and unlimited seats.
+        - generic [ref=e30]: $299.00
+        - button "Buy now" [ref=e31] [cursor=pointer]
+      - generic [ref=e32]:
+        - generic [ref=e33]: Popular
+        - heading "SoftSell Team Pack" [level=3] [ref=e34]
+        - generic [ref=e35]: Collaboration suite for up to 10 team members.
+        - generic [ref=e36]: $149.00
+        - button "Buy now" [ref=e37] [cursor=pointer]
+      - generic [ref=e38]:
+        - heading "SoftSell Starter" [level=3] [ref=e39]
+        - generic [ref=e40]: Everything a solo developer needs to get going.
+        - generic [ref=e41]: $49.00
+        - button "Buy now" [ref=e42] [cursor=pointer]
+      - generic [ref=e43]:
+        - generic [ref=e44]: Monthly
+        - heading "SoftSell Cloud Add-on" [level=3] [ref=e45]
+        - generic [ref=e46]: Managed cloud hosting and automatic backups.
+        - generic [ref=e47]: $19.00
+        - button "Buy now" [ref=e48] [cursor=pointer]
