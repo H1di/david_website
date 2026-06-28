@@ -1,0 +1,33 @@
+{
+  "_comment": "SoftSell product catalog. Add/edit/remove products by editing this array, then refresh the page (no restart needed).",
+  "products": [
+    {
+      "id": "ss-pro",
+      "name": "SoftSell Pro License",
+      "description": "Full-featured license with priority support and unlimited seats.",
+      "price": 299.0,
+      "badge": "Best value"
+    },
+    {
+      "id": "ss-team",
+      "name": "SoftSell Team Pack",
+      "description": "Collaboration suite for up to 10 team members.",
+      "price": 149.0,
+      "badge": "Popular"
+    },
+    {
+      "id": "ss-starter",
+      "name": "SoftSell Starter",
+      "description": "Everything a solo developer needs to get going.",
+      "price": 49.0,
+      "badge": ""
+    },
+    {
+      "id": "ss-cloud",
+      "name": "SoftSell Cloud Add-on",
+      "description": "Managed cloud hosting and automatic backups.",
+      "price": 19.0,
+      "badge": "Monthly"
+    }
+  ]
+}

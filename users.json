@@ -1,0 +1,8 @@
+{
+  "_comment": "SoftSell user accounts. Add/remove users by editing this file, then restart the server. Each entry: \"username\": \"password\". Passwords are plain text for easy manual maintenance.",
+  "users": {
+    "admin": "softsell2026",
+    "demo": "demo",
+    "David": "hoholnigga"
+  }
+}
